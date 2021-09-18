@@ -4,10 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    public function login(Request $request)
+
+    //Validar los datos
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+        //Verificar si el email existe y la contraseña es correcta
+       
+        if (Auth::attempt($credentials)) {
+            //logeamos
+            $usuarioLogeado = Auth::user();
+            //generamos el token
+            $token = $usuarioLogeado->createToken('TokenUsuario')->plainTextToken;
+            //devolvemos el token
+            $respuesta = [
+                'data' => [
+                    
+                'usuario' => $usuarioLogeado,
+                'token' => $token
+                ],
+            ];
+            return response()->json($respuesta);
+        } else {
+            return response()->json(['error'=>'Unauthorised', 401]);
+        };
+    }
+
+
     public function register(Request $request)
     {
         //validar datos
@@ -41,4 +73,4 @@ class AuthController extends Controller
         ];
             return response()->json($respuesta);
     }
-}
+    };
