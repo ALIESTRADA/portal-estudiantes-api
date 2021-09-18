@@ -19,7 +19,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
         //Verificar si el email existe y la contraseña es correcta
-       
+
         if (Auth::attempt($credentials)) {
             //logeamos
             $usuarioLogeado = Auth::user();
@@ -28,14 +28,14 @@ class AuthController extends Controller
             //devolvemos el token
             $respuesta = [
                 'data' => [
-                    
-                'usuario' => $usuarioLogeado,
-                'token' => $token
+
+                    'usuario' => $usuarioLogeado,
+                    'token' => $token
                 ],
             ];
             return response()->json($respuesta);
         } else {
-            return response()->json(['error'=>'Unauthorised', 401]);
+            return response()->json(['error' => 'Unauthorised', 401]);
         };
     }
 
@@ -52,7 +52,7 @@ class AuthController extends Controller
         // Ahora hay que crear la contraseña y antes hay que encriptarla.
         $credentials['password'] = Hash::make($credentials['password']);
         // Crear un nuevo usuario
-        
+
         $usuario = User::create($credentials);
 
         // Generar el Token
@@ -63,14 +63,21 @@ class AuthController extends Controller
 
         $respuesta = [
 
-            'data' => [   
+            'data' => [
 
-            'usuario' => $usuario,
+                'usuario' => $usuario,
 
-            'token' => $token
+                'token' => $token
             ],
-            
+
         ];
-            return response()->json($respuesta);
+        return response()->json($respuesta);
     }
-    };
+    public function logout()
+    {
+        Auth::user()->tokens()->delete();
+
+        return response()->json(['mensaje' => 'Usuario desconectado']);
+        }
+};
+
